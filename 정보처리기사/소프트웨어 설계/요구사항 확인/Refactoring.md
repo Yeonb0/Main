@@ -1,0 +1,2 @@
+- Design Improvement
+- 동작 변화 없이 내부 구조 변경

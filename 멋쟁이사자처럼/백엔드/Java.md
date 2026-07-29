@@ -1,0 +1,12 @@
+---
+aliases:
+  - 자바
+  - JAVA
+---
+- [[Java 개요]]
+- [[Java 명명 규칙]]
+- [[패키지]]
+- [[접근제어자]]
+- [[getter & setter]]
+- [[생성자|builder]]
+- [[OOP]]

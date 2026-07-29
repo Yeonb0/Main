@@ -1,0 +1,4 @@
+- 확률적 분석
+- 입력값의 분포를 [[Uniform Random Permuation]] 이라고 가정
+- [[지시 확률 변수]]
+- 

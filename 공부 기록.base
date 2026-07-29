@@ -1,0 +1,14 @@
+views:
+  - type: table
+    name: 표
+    filters:
+      and:
+        - file.ctime == "2026-07-13"
+    order:
+      - file.name
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC
+      - property: file.ctime
+        direction: ASC

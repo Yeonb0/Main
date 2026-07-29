@@ -1,0 +1,3 @@
+- [[AWS]] 제공 생성형 AI 어시스턴트
+- Amazon Q Business 
+- Amazon Q Developer

@@ -1,0 +1,5 @@
+- 체크 박스 (Check Box) : 여러 개 중 1개 이상 선택![[images_oneook_post_9773a93a-6989-492e-b9bc-886f9051534c_checkboxes-2.gif]]
+- 라디오 버튼 (Radio Button) : 여러 개 중 1개만 선택![[Pasted image 20260708125030.png]]
+- 텍스트 박스 (Text Box) : 데이터 입력 · 수정 가능![[Pasted image 20260708125144.png]]
+- 콤보 박스 (Combo Box) : 이미 지정된 내용 선택 + 수정![[Pasted image 20260708125100.png]]
+- 목록 상자 (List Box) : 지정된 내용 중 선택![[Pasted image 20260708125205.png]]
