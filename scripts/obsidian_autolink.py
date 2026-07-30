@@ -25,7 +25,12 @@ from pathlib import Path
 # 설정 기본값
 # ---------------------------------------------------------------------------
 
-DEFAULT_EXCLUDE_DIRS = {".obsidian", ".git", ".trash", "node_modules", "templates", "_templates"}
+# _inbox 는 아직 볼트가 아니다 - 인덱스에 넣으면 LLM 이 _inbox 를 폴더로 착각한다
+# _pending 은 검수 대기 노트끼리 링크가 걸려야 하므로 제외하지 않는다
+DEFAULT_EXCLUDE_DIRS = {".obsidian", ".git", ".trash", "node_modules", "templates", "_templates", "_inbox"}
+
+# 파이프라인 대기소 - 링크 삽입 대상은 되지만 링크 대상 사전에는 올리지 않는다
+PIPELINE_PREFIXES = ("_pending/", "_inbox/")
 
 # 너무 흔해서 링크로 만들면 소음이 되는 단어
 DEFAULT_STOPWORDS = {
@@ -415,22 +420,26 @@ def main():
     Stopwords |= {l.strip() for l in Path(args.stopwords).read_text(encoding="utf-8").splitlines() if l.strip()}
 
   Notes = collect_notes(vault, DEFAULT_EXCLUDE_DIRS)
-  Resolved, Ambiguous = build_index(Notes, args.min_len, Stopwords)
+  # _pending 은 아직 볼트가 아니다 - 링크 대상 사전과 미해결 목록에서 빼야 한다
+  # (빼지 않으면 검수 대기 중인 노트가 사전에 올라가 decompose 가 그걸 기존 노트로 착각한다)
+  # --only _pending 으로 수정하는 대상에서는 빠지지 않는다
+  Vault = [n for n in Notes if not any(n.rel.startswith(p) for p in PIPELINE_PREFIXES)]
+  Resolved, Ambiguous = build_index(Vault, args.min_len, Stopwords)
 
-  print("노트 %d개 / 링크 가능 개념 %d개 / 모호한 개념 %d개\n" % (len(Notes), len(Resolved), len(Ambiguous)))
+  print("노트 %d개 / 링크 가능 개념 %d개 / 모호한 개념 %d개\n" % (len(Vault), len(Resolved), len(Ambiguous)))
 
   if args.write_index:
     Lines = ["# kind\tterm\ttarget"]
     for term in sorted(Resolved):
       Lines.append("note\t%s\t%s" % (term, Resolved[term].rel[:-3]))
-    for term, srcs in sorted(unresolved_links(Notes).items(), key=lambda x: -len(x[1])):
+    for term, srcs in sorted(unresolved_links(Vault).items(), key=lambda x: -len(x[1])):
       Lines.append("stub\t%s\t(%d회 참조, 아직 없음)" % (term, len(srcs)))
     Path(args.write_index).write_text("\n".join(Lines) + "\n", encoding="utf-8")
     print("인덱스 저장 : %s (%d줄)" % (args.write_index, len(Lines) - 1))
     return 0
 
   if args.unresolved:
-    Missing = unresolved_links(Notes)
+    Missing = unresolved_links(Vault)
     if not Missing:
       print("미해결 링크 없음")
       return 0

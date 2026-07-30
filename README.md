@@ -53,6 +53,7 @@ Obsidian 볼트를 그대로 저장소에 올려 두고, [Quartz](https://quartz
 ├─ _inbox/                Notion 정리본 투입구 (자동화 입력)
 │   └─ _done/             처리 완료된 원본
 ├─ _pending/              분해 결과 대기소. 검수 후 아래 폴더로 이동 
+├─ images/                모든 첨부. ingest.py 가 `노트슬러그-01.png` 로 재명명해 모음
 │
 ├─ 자료구조/
 ├─ 알고리즘 설계와 분석/
@@ -121,17 +122,30 @@ python scripts/obsidian_autolink.py . --report
 
 ## MOC 규칙
 
-`_MOC` 노트는 **설명하지 않습니다.** 개념을 잇는 문장과 링크로만 구성합니다.
+`_MOC` 노트는 **설명하지 않습니다.** `###` 섹션 제목과 `- [[링크]]` 불릿으로만 구성합니다.
 
 ```markdown
 ---
-tags: [moc, java]
+tags:
+  - MOC
 ---
-# JVM 메모리 관리
 
-[[JVM 메모리 구조]]를 먼저 이해해야 [[가비지 컬렉션]]의 동작을 설명할 수 있다.
-힙 분할 전략은 [[G1 GC]]에서 구체화된다.
+### 메모리 구조
+- [[JVM 메모리 구조]]
+- [[객체]]
+
+### 회수
+- [[가비지 컬렉션]]
+- [[G1 GC]]
 ```
+
+지켜야 할 것:
+
+- **링크 뒤에 설명을 붙이지 않습니다.** `- [[가중치]] : 각 입력 신호의 중요도` 같은 형태는 금지.
+- 파이프 별칭(`- [[스크럼|스크럼(Scrum)]]`)과 짧은 묶음(`- [[Linked Stack]] / [[Linked Queue]]`)은 허용.
+- 개념 자체가 한 섹션 단위면 `### [[개념]]` 처럼 제목에 링크를 걸어도 됩니다.
+- 원본의 순서와 묶음은 **섹션 구성과 불릿 순서로만** 남깁니다. 인과(`->`)는 개별 노트 본문이 담당합니다.
+- 파일명이 제목이므로 `# 제목` 줄은 넣지 않습니다.
 
 설명이 MOC에 들어가기 시작하면 개별 노트와 내용이 중복되고, 둘 중 어느 쪽을 고쳐야 할지 알 수 없게 됩니다.
 
@@ -153,13 +167,18 @@ SORT file.name ASC
 | 파일 | 역할 |
 | --- | --- |
 | `watch.py` | `_inbox/` 감시 → 전체 파이프라인 실행 |
+| `ingest.py` | Notion export(zip / 폴더 / md) 정규화 → 첨부는 `images/` 로 이동·재명명 |
 | `decompose.py` | 통합 md → 원자 노트 + MOC 로 분해 (LLM 호출) |
 | `obsidian_autolink.py` | 자동 위키링크 삽입, 인덱스 / 중복 / 미해결 링크 보고 |
 
 ### 흐름
 
 ```
-_inbox/ 에 md 투입
+_inbox/ 에 Notion export 투입 (zip 그대로 / 압축 푼 폴더 / md 하나)
+  → ⓪ 정규화        ingest.py
+       · 첨부 → images/노트슬러그-01.png 로 이동·재명명 (내용 같으면 재사용)
+       · 참조 → ![[ ]] 위키링크로 치환 (한글 이중 인코딩 포함)
+       · 파일명에서 노션 해시 32자 제거
   → ① 사전 갱신     obsidian_autolink.py --write-index
   → ② LLM 분해      decompose.py
   → ③ 링크 보강     obsidian_autolink.py --only _pending --apply
@@ -167,13 +186,20 @@ _inbox/ 에 md 투입
   → _pending/ 에서 검수 후 볼트로 이동
 ```
 
+`images/`는 예외적으로 ⓪단계에서 볼트 본체에 바로 씁니다. 첨부는 검수 대상이 아니고,
+`_pending/`에 있는 동안에도 미리보기가 보여야 하기 때문입니다.
+
 **볼트 본체에 직접 쓰는 단계는 없습니다.** 결과는 항상 `_pending/`을 거칩니다.
 
 ### 자주 쓰는 명령
 
 ```bash
-# 감시 시작 (평소 사용법)
+# 감시 시작 (평소 사용법) - _inbox 에 zip 을 떨구면 알아서 돈다
 python scripts/watch.py --vault . --backend api
+
+# 분해 없이 첨부 정리만 (뭘 할지 먼저 확인)
+python scripts/ingest.py --vault . --dry-run
+python scripts/ingest.py --vault .
 
 # 제목이 중복된 개념 확인
 python scripts/obsidian_autolink.py . --report
