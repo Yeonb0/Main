@@ -23,3 +23,11 @@ def relu(x):
     return np.maximum(0, x)
 ```
 - `maximum` : 두 입력 중 큰 값 선택해 반환
+
+### [[미분]]
+$$
+\frac{\partial y}{\partial x} =\begin{cases}1 & (x > 0) \\0 & (x \le 0)\end{cases}
+$$
+
+- 입력 0 초과 -> 상류 값 그대로 하류 전달 / 0 이하 -> 0 전달
+- 구현 : [[ReLU 계층]]
