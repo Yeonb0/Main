@@ -16,3 +16,9 @@ aliases:
 - FM (Frequency Modulation) : 주파수로 modulation
 - AM (Amplitude Modulation) : 진폭으로 modulation
 	- noise 심함
+- PM (Phase Modulation) : 위상으로 modulation
+
+### 대상
+- digital data -> [[Digital-to-Analog Conversion]]
+- analog data -> [[Analog-to-Analog Conversion]]
+- 변조 기준 신호 -> [[Carrier Signal]]

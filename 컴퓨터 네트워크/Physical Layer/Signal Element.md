@@ -14,3 +14,5 @@ aliases:
 - 초당 보내지는 signal element 수
 - 단위 : ==baud==
 - r 값 파악 -> bps 변환 O
+- $S = N \times \frac{1}{r}$
+	- N = [[Data Transfer Rate 1|bit rate]], S = baud rate

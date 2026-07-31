@@ -46,3 +46,8 @@ $$
 	- 순간적으로 급변하는 신호 -> frequency 무한대
 - 서로 다른 신호 구분 기준 -> ==진폭(amplitude) / 주파수(frequency) / 위상(Phase)==
 - 여러 신호의 합 -> [[Composite Signal]]
+
+### 활용
+- 진폭 / 주파수 / 위상 조절 -> [[Digital-to-Analog Conversion]] 인코딩 수단
+	- [[Amplitude Shift Keying]] / [[Frequency Shift Keying]] / [[Phase Shift Keying]]
+- analog data 를 [[Carrier Signal]] 에 적재 -> [[Analog-to-Analog Conversion]]

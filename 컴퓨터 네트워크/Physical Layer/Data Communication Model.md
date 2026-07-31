@@ -17,3 +17,4 @@ aliases:
 ### 특징
 - 전달 과정에서 오류 발생 가능 -> 검증 필요
 - 신호 손상 원인 -> [[Transmission Impairment]]
+- bandpass 매체(wireless, shared media) 전송 -> [[Digital-to-Analog Conversion]] 필수

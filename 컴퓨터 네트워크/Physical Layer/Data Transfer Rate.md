@@ -22,3 +22,4 @@ aliases:
 
 ### 특징
 - header · overhead · 혼잡 제외한 실제값 -> [[Throughput]]
+- baud rate 환산 -> $S = N \times \frac{1}{r}$, r 은 [[Signal Element]] 기준
