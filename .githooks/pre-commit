@@ -1,0 +1,44 @@
+#!/bin/sh
+# 커밋 전에 마크다운 링크·표를 자동 교정한다
+#
+#   1) relink.py  : [[_pending/...]] 로 굳은 링크를 볼트 링크로 되돌린다
+#                   (_pending 에서 볼트로 파일을 옮길 때마다 옵시디언이 만들어 놓는다)
+#   2) mdtable.py : 표 셀 안의 [[대상|표시]] 파이프를 \| 로 막는다
+#
+# 고친 파일은 다시 스테이징한다. 무엇을 고쳤는지 커밋 로그 위에 출력된다.
+#
+# 끄고 싶으면 : git config --unset core.hooksPath
+# 한 번만 건너뛰려면 : git commit --no-verify
+
+set -e
+
+VAULT=$(git rev-parse --show-toplevel)
+PY=$(command -v python || command -v py || true)
+[ -z "$PY" ] && exit 0
+
+# 스테이징된 md 만 본다
+# core.quotepath=false 가 없으면 한글 경로가 "\353\250..." 로 나와 파일을 못 찾는다
+FILES=$(git -c core.quotepath=false diff --cached --name-only --diff-filter=ACM -- '*.md')
+[ -z "$FILES" ] && exit 0
+
+CHANGED=""
+IFS='
+'
+for f in $FILES; do
+  [ -f "$VAULT/$f" ] || continue
+  BEFORE=$(git hash-object "$VAULT/$f")
+  "$PY" "$VAULT/scripts/relink.py" "$VAULT/$f" --vault "$VAULT" --apply >/dev/null
+  "$PY" "$VAULT/scripts/mdtable.py" "$VAULT/$f" --apply >/dev/null
+  AFTER=$(git hash-object "$VAULT/$f")
+  if [ "$BEFORE" != "$AFTER" ]; then
+    git add "$VAULT/$f"
+    CHANGED="$CHANGED  $f
+"
+  fi
+done
+
+if [ -n "$CHANGED" ]; then
+  printf '[pre-commit] 링크·표 자동 교정 :\n%s' "$CHANGED"
+fi
+
+exit 0

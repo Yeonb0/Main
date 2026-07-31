@@ -8,8 +8,9 @@ decompose.py
   1패스 : 문서를 읽고 '보강할 기존 노트' 목록만 고른다 (사전만 첨부, 값싸다)
   2패스 : 그 노트들의 본문 전문을 첨부해 분해 + 수정판을 함께 받는다
 
-수정판은 볼트를 직접 건드리지 않는다. `_pending/<원본과 같은 경로>.md` 와
-그 옆의 `.md.diff` 로 나오고, 사람이 검수한 뒤 덮어쓴다.
+수정판은 볼트를 직접 건드리지 않는다. `_pending/<원본과 같은 폴더>/<제목>.updated.md` 와
+그 옆의 `.diff` 로 나오고, 사람이 검수한 뒤 볼트 원본에 덮어쓴다.
+(`.updated` 를 붙이는 이유는 UPDATED_SUFFIX 주석 참고 - 이름이 겹치면 _pending 안의 링크가 여기로 붙는다)
 
 LLM 호출부는 백엔드 두 가지를 지원한다
 
@@ -39,6 +40,8 @@ import urllib.request
 from collections import Counter
 from datetime import date
 from pathlib import Path
+
+from mdtable import fix_text
 
 MODEL = "claude-sonnet-4-6"
 API_URL = "https://api.anthropic.com/v1/messages"
@@ -81,6 +84,10 @@ RULES = """\
   정의 / 종류 / 형태 / 구조 / 기능 / 상태 / 특징 / 장점 / 단점 / 절차 / 조건
 - 순서가 있는 절차는 `1. 2. 3.` 번호 목록.
 - 속성-설명 짝이 3개 이상이면 표를 쓴다. (`| 항목 | 내용 |`)
+  - **표 셀 안의 파이프 별칭 링크는 `\\|` 로 이스케이프한다.** 안 하면 셀이 쪼개져 표가 통째로 밀린다.
+    - O : `| [[다층 퍼셉트론\\|MLP]] 의 flatten | 이미지 전체 |`
+    - X : `| [[다층 퍼셉트론|MLP]] 의 flatten | 이미지 전체 |`
+  - 셀 안의 다른 `|` (임베드 크기 `![[img.png\\|300]]` 등)도 마찬가지다.
 - 예시는 `==ex)==` 로 시작한다.
 - `==하이라이트==` 는 개념이 아닌 것을 강조할 때만 쓴다. (수치, 조건, 대비되는 단어 등)
   **개념 이름은 하이라이트가 아니라 링크다.** `==임곗값==` X -> `[[임곗값]]` O
@@ -475,6 +482,13 @@ def parse_front(front):
   return [a for a in Aliases if a], Rest
 
 
+def clean_body(text):
+  """LLM 이 뱉은 본문 교정 - 표 셀 안의 `[[대상|표시]]` 파이프를 `\\|` 로 막는다
+
+  규칙에 적어 두긴 했지만 모델이 자주 잊는다. 표가 통째로 밀려 버리므로 여기서 한 번 더 막는다"""
+  return fix_text(text or "")[0]
+
+
 def norm_line(line):
   """줄 대조용 정규화 - 위키링크와 강조 표시를 벗겨 '링크만 새로 걸린 줄' 을 같은 줄로 본다"""
   s = LINK_RE.sub(lambda m: m.group(2) or m.group(1), line)
@@ -517,10 +531,36 @@ def render_update(old_text, new_body, add_aliases):
   return "\n".join(Out) + "\n\n" + new_body.strip() + "\n"
 
 
+# 수정판 마커 - 볼트 원본과 파일명이 겹치지 않게 한다
+#
+# 겹치면 `_pending` 안의 `[[학습률]]` 이 볼트 원본이 아니라 옆에 있는 수정판에 붙는다.
+# 그 상태로 노트를 볼트에 옮기면 옵시디언(alwaysUpdateLinks)이 가리키던 대상을 유지하려고
+# `[[_pending/머신러닝/학습률]]` 로 경로를 박아 넣고, _pending 을 비우는 순간 다 깨진다.
+# 이름이 다르면 후보가 볼트 원본 하나뿐이라 이 일이 아예 안 생긴다.
+#
+# 신규 노트의 'AMI (1)' 은 동음이의어 마커라 의미가 다르다 - 그쪽과 섞지 않는다.
+UPDATED_SUFFIX = ".updated"
+
+
+def pending_path(rel):
+  """볼트 상대경로 -> _pending 안의 수정판 경로 ('머신러닝/학습률.md' -> '머신러닝/학습률.updated.md')"""
+  return rel[:-3] + UPDATED_SUFFIX + ".md" if rel.endswith(".md") else rel + UPDATED_SUFFIX
+
+
+def vault_rel(pending_rel):
+  """반대 방향 - 수정판 이름이 아니면 None"""
+  tail = UPDATED_SUFFIX + ".md"
+  return pending_rel[:-len(tail)] + ".md" if pending_rel.endswith(tail) else None
+
+
 def write_diff(vault, pending, rel, Header):
-  """볼트 원본과 _pending 수정판을 대조해 .diff 를 쓴다 - 소실된 줄 목록을 돌려준다"""
+  """볼트 원본과 _pending 수정판을 대조해 .diff 를 쓴다 - 소실된 줄 목록을 돌려준다
+
+  rel 은 항상 볼트 상대경로다. _pending 쪽 파일명은 pending_path 가 정한다"""
   old_body = strip_front((vault / rel).read_text(encoding="utf-8"))[1].strip()
-  out = pending / rel
+  out = pending / pending_path(rel)
+  if not out.is_file():
+    out = pending / rel          # 옛 규칙(같은 이름)으로 쌓인 수정판
   new_body = strip_front(out.read_text(encoding="utf-8"))[1].strip()
   Lost = lost_lines(old_body, new_body)
 
@@ -538,10 +578,12 @@ def rediff(vault, pending):
   """_pending 의 모든 수정판 .diff 를 다시 계산한다
 
   링크 보강 단계가 수정판을 또 고치므로 파이프라인 끝에서 한 번 더 돌려야 diff 가 맞는다.
-  '수정판' 판별 기준은 _pending 의 상대 경로가 볼트에도 있는 것이다"""
+  '수정판' 판별은 `<제목>.updated.md` 이름 규칙이고, 그 볼트 경로가 실재해야 한다.
+  옛 규칙(볼트와 같은 이름)으로 쌓여 있는 것도 비울 때까지 같이 잡아 준다"""
   Redone = []
   for path in sorted(pending.rglob("*.md")):
-    rel = path.relative_to(pending).as_posix()
+    pending_rel = path.relative_to(pending).as_posix()
+    rel = vault_rel(pending_rel) or pending_rel
     if not is_vault_path(rel) or not (vault / rel).is_file():
       continue
     # 이전 diff 의 머리말(# 로 시작하는 줄)은 살린다 - source · change 기록이 들어 있다
@@ -558,7 +600,7 @@ def rediff(vault, pending):
 
 
 def write_updates(result, vault, pending, source_name):
-  """기존 노트 수정판을 _pending 의 같은 경로에 쓰고 옆에 .diff 를 남긴다
+  """기존 노트 수정판을 _pending 의 같은 폴더에 `<제목>.updated.md` 로 쓰고 옆에 .diff 를 남긴다
 
   볼트 원본은 절대 건드리지 않는다 - 검수한 사람이 직접 덮어쓴다"""
   Updated, Rejected = [], []
@@ -568,7 +610,7 @@ def write_updates(result, vault, pending, source_name):
     if rel and not rel.endswith(".md"):
       rel += ".md"
     src = vault / rel
-    new_body = (upd.get("body") or "").strip()
+    new_body = clean_body(upd.get("body")).strip()
     if not rel or not is_vault_path(rel) or not src.is_file():
       Rejected.append((rel or "(경로 없음)", "볼트 본체에 그 경로가 없음"))
       continue
@@ -584,7 +626,8 @@ def write_updates(result, vault, pending, source_name):
 
     added = len([l for l in new_body.splitlines() if l.strip()]) - len([l for l in old_body.splitlines() if l.strip()])
 
-    out = pending / rel
+    # 볼트 원본과 이름이 겹치면 _pending 안의 링크가 볼트가 아니라 여기로 붙는다 (UPDATED_SUFFIX 주석 참고)
+    out = pending / pending_path(rel)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render_update(old_text, new_body, upd.get("add_aliases", [])), encoding="utf-8")
 
@@ -611,9 +654,10 @@ def render(note, is_moc=False):
   if is_moc:
     Front.extend(["tags:", "  - MOC"])
   Front.append("---")
+  body = clean_body(note.get("body")).strip()
   if len(Front) == 2:
-    return note.get("body", "").strip() + "\n"
-  return "\n".join(Front) + "\n\n" + note.get("body", "").strip() + "\n"
+    return body + "\n"
+  return "\n".join(Front) + "\n\n" + body + "\n"
 
 
 def write_notes(result, vault, pending, overwrite, on_conflict="auto"):

@@ -88,7 +88,7 @@ def process(doc, vault, index, pending, backend, model, no_update, max_context, 
     target = done / ("%s_%s%s" % (doc.stem, int(time.time()), doc.suffix))
   doc.rename(target)
   print("  완료 - 원본 이동 : %s" % target.relative_to(vault))
-  print("  검수 후 %s 에서 볼트로 옮기세요 (status: updated 는 덮어쓰기, .diff 로 차이 확인)" % pending)
+  print("  검수 후 %s 에서 볼트로 옮기세요 (.updated.md 는 옮기지 말고 내용만 원본에 덮어쓰기, .diff 로 차이 확인)" % pending)
 
 
 def main():

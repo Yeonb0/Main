@@ -38,6 +38,8 @@ import urllib.parse
 import zipfile
 from pathlib import Path
 
+from mdtable import fix_text
+
 WIN_FORBIDDEN = r'[\\/:*?"<>|]'
 NOTION_HASH = re.compile(r"[ _-]+[0-9a-f]{32}$")
 
@@ -202,7 +204,8 @@ def rewrite(text, resolver, store, slug, Log):
 
   text = MD_LINK.sub(on_md, text)
   text = WIKI_LINK.sub(on_wiki, text)
-  return text
+  # 표 셀 안에 들어간 `[[대상|표시]]` 는 `|` 가 셀 구분자로 먹혀 표를 밀어버린다
+  return fix_text(text)[0]
 
 
 # ---------------------------------------------------------------------------

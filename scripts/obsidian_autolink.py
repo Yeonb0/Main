@@ -21,6 +21,8 @@ import re
 import sys
 from pathlib import Path
 
+from mdtable import in_table_row
+
 # ---------------------------------------------------------------------------
 # 설정 기본값
 # ---------------------------------------------------------------------------
@@ -31,6 +33,9 @@ DEFAULT_EXCLUDE_DIRS = {".obsidian", ".git", ".trash", "node_modules", "template
 
 # 파이프라인 대기소 - 링크 삽입 대상은 되지만 링크 대상 사전에는 올리지 않는다
 PIPELINE_PREFIXES = ("_pending/", "_inbox/")
+
+# decompose.py 가 수정판에 붙이는 마커 (`학습률.updated.md`)
+UPDATED_SUFFIX = ".updated"
 
 # 너무 흔해서 링크로 만들면 소음이 되는 단어
 DEFAULT_STOPWORDS = {
@@ -328,6 +333,20 @@ def existing_link_counts(text):
   return Counts
 
 
+def vault_counterpart(rel):
+  """_pending 파일이 볼트의 어느 노트에 해당하는지 - 대응이 없으면 그대로 돌려준다
+
+  수정판(`_pending/머신러닝/학습률.updated.md`)은 검수 후 볼트 원본(`머신러닝/학습률.md`)에
+  덮어쓸 내용이다. 이걸 모르면 자동 링크가 수정판 본문에 `[[학습률]]` 을 넣고,
+  그 자기 자신 링크가 볼트 원본까지 따라 들어간다"""
+  for p in PIPELINE_PREFIXES:
+    if rel.startswith(p):
+      rel = rel[len(p):]
+      break
+  tail = UPDATED_SUFFIX + ".md"
+  return rel[:-len(tail)] + ".md" if rel.endswith(tail) else rel
+
+
 def find_matches(text, Mask, Resolved, self_note, max_per_target, use_path):
   """
   (start, end, 치환문자열, term, 대상경로) 리스트를 반환한다
@@ -336,12 +355,14 @@ def find_matches(text, Mask, Resolved, self_note, max_per_target, use_path):
   """
   Candidates = []
   scanner = compile_scanner(Resolved)
+  # 자기 자신 링크 금지 - _pending 수정판은 볼트 원본을 자기 자신으로 본다
+  Self = {self_note.rel, vault_counterpart(self_note.rel)} if self_note is not None else set()
 
   for m in scanner.finditer(text):
     s, e = m.start(), m.end()
     term = m.group(0)
     target = Resolved[term]
-    if self_note is not None and target.rel == self_note.rel:
+    if target.rel in Self:
       continue
     if not is_free(Mask, s, e):
       continue
@@ -365,7 +386,9 @@ def find_matches(text, Mask, Resolved, self_note, max_per_target, use_path):
     if term == target.title and not use_path:
       repl = "[[%s]]" % term
     else:
-      repl = "[[%s|%s]]" % (dest, term)
+      # 표 셀 안에서는 `|` 가 셀 구분자다 - 그냥 넣으면 표가 밀린다
+      bar = "\\|" if in_table_row(text, s) else "|"
+      repl = "[[%s%s%s]]" % (dest, bar, term)
 
     Matches.append((s, e, repl, term, target.rel))
     Budget[stem] -= 1
