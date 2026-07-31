@@ -1,6 +1,7 @@
 ---
 aliases:
   - Amazon Machine Images
+  - AMI
 ---
 - [[운영체제|OS]] 및 [[소프트웨어]]가 설치된 디스크 이미지 (템플릿)
 - [[EC2]] 구성 핵심 요소!

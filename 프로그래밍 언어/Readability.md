@@ -32,6 +32,7 @@ aliases:
 	- [[폰 노이만 구조]] -> 위에서 아래로 자연스러운 흐름
 	- [[GOTO]]-less : jump 구조 최소 사용
 	- [[Structured Programming]] : 들어오는 곳 1, 나가는 곳 1
+	- [[GOTO]] : 문장 나타나는 순서 ≠ 실행 순서 -> 가독성↓
 - [[데이터 타입|Data Type]] & [[Data Structure]]
 	- [[데이터]] 표현 명확할수록 가독성↑
 	- ==ex)== boolean -> [[C]]에 존재 X -> 오류 多

@@ -407,7 +407,9 @@ def safe_name(title):
 
 
 def existing_titles(vault):
-  """볼트에 이미 있는 노트 제목 - _inbox 는 아직 볼트가 아니므로 제외한다
+  """볼트에 이미 있는 노트 제목 -> 경로 목록 (같은 제목이 여러 폴더에 있을 수 있다)
+
+  _inbox 는 아직 볼트가 아니므로 제외한다
   (제외하지 않으면 지금 분해하는 원본이 '이미 있는 노트'로 잡혀 같은 제목 노트가 안 생긴다)"""
   Titles = {}
   for root, dirs, files in os.walk(vault):
@@ -415,8 +417,29 @@ def existing_titles(vault):
     for f in files:
       if f.endswith(".md"):
         rel = os.path.relpath(os.path.join(root, f), vault).replace(os.sep, "/")
-        Titles.setdefault(f[:-3], rel)
+        Titles.setdefault(f[:-3], []).append(rel)
   return Titles
+
+
+NUM_SUFFIX = re.compile(r"\s*\(\d+\)$")
+
+
+def parent_of(rel):
+  """'AI/신경망.md' -> 'AI' (루트에 있으면 빈 문자열)"""
+  return rel.rsplit("/", 1)[0] if "/" in rel else ""
+
+
+def numbered_title(title, folder, pending, Known):
+  """'AMI' -> 'AMI (1)' - 볼트 제목과 _pending 에 이미 있는 파일 양쪽을 피해 빈 번호를 찾는다
+
+  이미 '(n)' 이 붙은 제목이 또 들어오면 번호만 올린다 ('AMI (1) (1)' 방지)"""
+  base = NUM_SUFFIX.sub("", title) or title
+  n = 1
+  while True:
+    cand = "%s (%d)" % (base, n)
+    if cand not in Known and not (pending / folder / (cand + ".md")).exists():
+      return cand
+    n += 1
 
 
 FRONT_RE = re.compile(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*\r?\n?", re.S)
@@ -593,9 +616,16 @@ def render(note, is_moc=False):
   return "\n".join(Front) + "\n\n" + note.get("body", "").strip() + "\n"
 
 
-def write_notes(result, vault, pending, overwrite):
+def write_notes(result, vault, pending, overwrite, on_conflict="auto"):
+  """신규 노트를 _pending 에 쓴다
+
+  제목이 볼트 노트와 겹칠 때 (on_conflict)
+    auto   : 폴더가 다르면 동음이의어로 보고 'AMI (1)' 로 번호를 붙이고,
+             폴더가 같으면 같은 개념으로 보고 건너뛴다 (같은 문서 재실행 시 중복 방지)
+    number : 폴더와 무관하게 항상 번호를 붙인다
+    skip   : 항상 건너뛴다"""
   Known = existing_titles(vault)
-  Written, Skipped = [], []
+  Written, Skipped, Renamed = [], [], []
 
   Items = [(n, False) for n in result.get("notes", [])]
   if result.get("moc"):
@@ -609,18 +639,29 @@ def write_notes(result, vault, pending, overwrite):
     # LLM 이 파이프라인 폴더를 골랐으면 떼어낸다 - _pending 안에 또 _inbox 가 생기는 것 방지
     Parts = [p for p in folder.split("/") if p and p not in ("_inbox", "_pending")]
     folder = "/".join(Parts)
-    out = pending / folder / (title + ".md")
 
-    if title in Known and not overwrite:
-      Skipped.append((title, Known[title]))
-      continue
+    Hits = Known.get(title, [])
+    if Hits and not overwrite:
+      same_folder = any(parent_of(rel) == folder for rel in Hits)
+      if on_conflict == "skip" or (on_conflict == "auto" and same_folder):
+        Skipped.append((title, Hits[0]))
+        continue
+      renamed = numbered_title(title, folder, pending, Known)
+      Renamed.append((title, Hits[0], renamed))
+      title = renamed
+
+    out = pending / folder / (title + ".md")
+    # 한 응답에 같은 제목이 두 번 나오거나 지난 실행 결과가 남아 있으면 덮어쓰지 않고 번호를 올린다
+    if out.exists() and not overwrite:
+      title = numbered_title(title, folder, pending, Known)
+      out = pending / folder / (title + ".md")
 
     out.parent.mkdir(parents=True, exist_ok=True)
     note["title"] = title
     out.write_text(render(note, is_moc), encoding="utf-8")
     Written.append(str(out.relative_to(pending)).replace(os.sep, "/"))
 
-  return Written, Skipped
+  return Written, Skipped, Renamed
 
 
 # ---------------------------------------------------------------------------
@@ -637,7 +678,10 @@ def main():
   ap.add_argument("--model", default=MODEL)
   ap.add_argument("--max-tokens", type=int, default=16000)
   ap.add_argument("--show-prompt", action="store_true", help="프롬프트만 출력하고 종료 (1패스는 실제로 돈다)")
-  ap.add_argument("--overwrite", action="store_true", help="볼트에 같은 제목이 있어도 결과를 생성")
+  ap.add_argument("--overwrite", action="store_true", help="볼트에 같은 제목이 있어도 같은 이름으로 생성")
+  ap.add_argument("--on-conflict", choices=["auto", "number", "skip"], default="auto",
+                  help="볼트에 같은 제목이 있을 때 : auto=폴더가 다르면 'AMI (1)' 로 번호, 같으면 건너뜀 "
+                       "/ number=항상 번호 / skip=항상 건너뜀 (기본 auto)")
   ap.add_argument("--no-update", action="store_true",
                   help="기존 노트 보강을 끄고 신규 노트만 만든다 (LLM 호출 1번)")
   ap.add_argument("--max-context-notes", type=int, default=12,
@@ -721,7 +765,7 @@ def main():
 
   step += 1
   print("[%d/%d] %s 에 쓰기 ..." % (step, steps, pending))
-  Written, Skipped = write_notes(result, vault, pending, args.overwrite)
+  Written, Skipped, Renamed = write_notes(result, vault, pending, args.overwrite, args.on_conflict)
   Updated, Rejected = ([], []) if args.no_update else write_updates(result, vault, pending, doc.name)
 
   print("\n생성 %d개 :" % len(Written))
@@ -740,6 +784,12 @@ def main():
     print("\n보강 무시 %d개 :" % len(Rejected))
     for rel, why in Rejected:
       print("  x %s  (%s)" % (rel, why))
+
+  if Renamed:
+    print("\n제목이 겹쳐 번호를 붙임 %d개 (같은 개념이면 합치고, 아니면 제목을 손보세요) :" % len(Renamed))
+    for t, rel, new in Renamed:
+      print("  ! %s  (볼트 : %s)  ->  %s" % (t, rel, new))
+    print("  다른 노트의 [[%s]] 링크는 볼트 원본을 가리킵니다 - 필요하면 검수할 때 고치세요" % Renamed[0][0])
 
   if Skipped:
     print("\n볼트에 이미 있어 건너뜀 %d개 (합칠지 직접 판단하세요) :" % len(Skipped))

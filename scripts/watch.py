@@ -55,7 +55,7 @@ def stable(path, wait=1.5):
     return False
 
 
-def process(doc, vault, index, pending, backend, model, no_update, max_context):
+def process(doc, vault, index, pending, backend, model, no_update, max_context, on_conflict):
   print("\n=== %s ===" % doc.name)
   if not stable(doc):
     print("  아직 쓰는 중 - 다음 주기에 재시도")
@@ -68,7 +68,7 @@ def process(doc, vault, index, pending, backend, model, no_update, max_context):
   Argv = [SCRIPTS / "decompose.py", doc, "--vault", vault,
           "--pending", pending, "--index", index,
           "--backend", backend, "--model", model,
-          "--max-context-notes", max_context]
+          "--max-context-notes", max_context, "--on-conflict", on_conflict]
   if no_update:
     Argv.append("--no-update")
   ok = run(Argv, vault)
@@ -106,6 +106,9 @@ def main():
                   help="기존 노트 보강을 끄고 신규 노트만 만든다 (LLM 호출 1번)")
   ap.add_argument("--max-context-notes", type=int, default=12,
                   help="보강 대상으로 본문을 첨부할 기존 노트 최대 개수")
+  ap.add_argument("--on-conflict", choices=["auto", "number", "skip"], default="auto",
+                  help="볼트에 같은 제목이 있을 때 : auto=폴더가 다르면 'AMI (1)' 로 번호, 같으면 건너뜀 "
+                       "/ number=항상 번호 / skip=항상 건너뜀 (기본 auto)")
   args = ap.parse_args()
 
   vault = Path(args.vault).resolve()
@@ -135,7 +138,7 @@ def main():
         continue
       Seen.add(key)
       process(doc, vault, args.index, args.pending, args.backend, args.model,
-              args.no_update, args.max_context_notes)
+              args.no_update, args.max_context_notes, args.on_conflict)
 
     if args.once:
       return 0

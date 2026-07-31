@@ -13,3 +13,5 @@ aliases:
 	- [[바인딩 시점]]에 따라 static / dynamic 선택
 - [[Aliasing]] : 같은 저장 공간 대해 여러 [[이름]] 가짐
 	- debugging 어려움 -> 위험
+- [[Pointer]] : [[Dangling Pointer]] & lost object -> memory leak 위험
+	- [[Ordinal Type]] · [[Subrange Type]] -> 값 범위 제한 -> [[Reliability 1|신뢰성]]↑

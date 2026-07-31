@@ -26,7 +26,7 @@ tags:
 ### 컴퓨팅 서비스
 - [[EC2|Amazon EC2]]
 - [[EC2 인스턴스]]
-- [[AMI]]
+- [[AWS AMI]]
 - [[EBS|Amazon EBS]]
 - [[Elastic IP]]
 

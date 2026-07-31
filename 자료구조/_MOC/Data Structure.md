@@ -6,7 +6,7 @@ aliases:
 ### Basic Concepts
 - [[시스템 생명 주기]]
 - [[ADT]]
-- [[pointer]]
+- [[Pointer]]
 - [[성능 분석]]
 - [[시간 복잡도]]
 - [[공간 복잡도]]
