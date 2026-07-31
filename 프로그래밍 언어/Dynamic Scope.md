@@ -21,3 +21,8 @@ aliases:
 ### 단점
 - [[타입 검사]] 어려움
 - [[Reliability|신뢰성]] ↓
+
+### 구현
+- nonlocal 변수 -> [[Activation Record]] 안, [[stack]] 어딘가에 존재
+- [[Deep Access]] : dynamic chain 따라 선언 탐색
+- [[Shallow Access]] : 변수 [[이름]]마다 별도 stack 유지

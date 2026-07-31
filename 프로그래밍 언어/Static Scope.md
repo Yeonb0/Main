@@ -4,8 +4,8 @@ aliases:
   - Static Scope(정적 스코프)
 ---
 
-- 대부분의 언어가 사용하는 [[Scope 1]] 결정 방식
-- 계층적 구조 - scope 가 nest 된 구조
+- 대부분의 언어가 사용하는 [[Scope]] 결정 방식
+- 계층적 구조 - [[Scope|scope]] 가 nest 된 구조
 
 ![[Names,-Bindings,-Type-Checking,-and-Scop-01.png]]
 
@@ -27,3 +27,9 @@ aliases:
 	- visible 하면 안 되는 것들이 보임
 
 ![[Names,-Bindings,-Type-Checking,-and-Scop-02.png]]
+
+### 구현
+- nonlocal [[변수]] 접근 규칙 -> [[Nested Subprograms]]
+- static link 는 [[Activation Record]] 안에 저장
+- [[Static Chain]] : ancestor 를 link 로 연결해 탐색
+- [[Display]] : 접근 가능한 record 주소를 [[배열]]에 모아 저장
