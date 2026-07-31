@@ -1,2 +1,4 @@
 - source -> 중간 언어 (Intermediate Language) 로 번역 -> byte code 를 [[인터프리터|interpreting]]
 - ==ex)== [[Java]]
+
+![[Preliminaries-03.png]]

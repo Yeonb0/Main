@@ -3,6 +3,7 @@ aliases:
   - 작성 용이성
   - Writability(작성 용이성)
 ---
+
 - Simplicity & Orthogonality
 
 - [[추상화|Abstraction(추상화)]] : 속내용 감추기
@@ -11,3 +12,8 @@ aliases:
 	- 데이터 추상화 : [[데이터]]가 어떻게 저장되어 있는지 모름
 
 - Expressivity : 계산을 간단하게 표현
+	- 기능 多 -> [[Writability 1|작성 용이성]]↑
+	``` c
+	count++
+	count = count + 1
+	```

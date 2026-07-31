@@ -33,6 +33,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.request
 from collections import Counter
@@ -378,13 +379,26 @@ MOCK_SELECT = json.dumps({"targets": []}, ensure_ascii=False)
 # ---------------------------------------------------------------------------
 
 def extract_json(raw):
-  """코드펜스나 잡담이 섞여 있어도 JSON 객체만 뽑아낸다"""
+  """코드펜스나 잡담이 섞여 있어도 JSON 객체만 뽑아낸다
+
+  strict=False : 모델이 body 안에 \\n · \\t 를 이스케이프하지 않고 날것으로 흘리는 일이 잦다.
+  노트 본문은 원래 개행과 탭 들여쓰기를 담으므로 그대로 받아들인다."""
   text = raw.strip()
   text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.MULTILINE).strip()
   start, end = text.find("{"), text.rfind("}")
   if start == -1 or end <= start:
     raise SystemExit("LLM 응답에서 JSON 을 찾지 못했습니다:\n" + raw[:800])
-  return json.loads(text[start:end + 1])
+  blob = text[start:end + 1]
+  try:
+    return json.loads(blob, strict=False)
+  except json.JSONDecodeError as e:
+    dump = Path(tempfile.gettempdir()) / "decompose_last_response.txt"
+    dump.write_text(raw, encoding="utf-8")
+    lines = blob.splitlines()
+    near = lines[e.lineno - 1][max(0, e.colno - 120):e.colno + 120] if e.lineno <= len(lines) else ""
+    raise SystemExit(
+      "LLM 응답 JSON 파싱 실패 : %s\n  문제 부근 : %s\n  응답 원본 : %s" % (e, near, dump)
+    )
 
 
 def safe_name(title):
