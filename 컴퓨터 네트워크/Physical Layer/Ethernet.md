@@ -2,10 +2,11 @@
 aliases:
   - 이더넷
   - 이더넷(Ethernet)
+  - Ethernet(이더넷)
 ---
 
 - 유선 인터넷 표준 -> [[IEEE 802.3]]
-	- cf) IEEE 802.11 -> Wi-Fi 표준
+	- cf) IEEE 802.11 -> [[Wi-Fi]] 표준
 - 네트워크 커버 영역
 	- [[LAN]] (local, 강의실 정도)
 	- [[MAN]] (metropolitan, 마포구 정도)
@@ -32,3 +33,8 @@ aliases:
 | 100BASE-TX | [[MLT-3]] + [[4B5B]] |
 | 1000BASE-T | 8B1Q4 & 4D-PAN5 |
 | 10GBASE-T | PAM-16 + DSQ128 + LDPC |
+
+### Medium Access
+- [[CSMA-CD|CSMA/CD]] 로 매체 접근 제어
+- 최소 frame 크기 512 bit (64 byte) -> collision detect 보장
+- time slot 512 bit times -> [[Binary Exponential Backoff]] 단위
