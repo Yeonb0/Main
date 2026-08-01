@@ -53,3 +53,9 @@ case
     when count < 1000 then bag3 = true
 end
 ```
+
+### 어셈블리 구현
+- [[switch 문의 어셈블리 구현]] : 범위 검사 + 간접 분기로 변환
+- case 연속 · 밀집 -> [[Jump Table]] $O(1)$
+- case sparse -> [[Binary Search]] $O(\log n)$
+- case 3 ~ 4개 이하 -> 선형 비교
