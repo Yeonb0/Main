@@ -6,7 +6,7 @@ aliases:
 ---
 
 - [[Collision|충돌]] 감지 대신 회피하는 [[CSMA]] 확장
-- 무선 ([[Wi-Fi]]) 에서 주로 사용 -> detect 불가능 -> avoid
+- 무선 ([[IEEE 802.11|Wi-Fi]]) 에서 주로 사용 -> detect 불가능 -> avoid
 
 ### 배경
 - 무선 -> [[Half Duplex]]

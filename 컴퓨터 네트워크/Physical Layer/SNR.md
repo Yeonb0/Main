@@ -17,3 +17,9 @@ aliases:
 - SNR 너무 낮음 -> 신호 복구 불가능
 - $\text{SNR}_{dB} = 10 \log_{10}(\text{SNR})$ -> [[Decibel]] 표현
 - [[Shannon Capacity]] 계산 입력값 (not dB)
+
+### 무선 환경
+- 수신 세기 이외의 noise 반영 -> 무선 링크 품질 지표
+- SNR ↑ -> 높은 [[MCS]] level 사용 O
+	- ==ex)== BPSK, 64-[[Quadrature Amplitude Modulation|QAM]]
+- 요구 SNR + noise floor -> [[Receiver Sensitivity]]

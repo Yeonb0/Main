@@ -26,3 +26,7 @@ aliases:
 ![[Framing-Error-Control-11.png]]
 - $S_n$ : sequence number
 - 마지막 Receiver : Out-of-Order frame 오더라도 ACK 전송
+
+### cf) [[TCP Sequence Number]]
+- [[TCP]] -> frame 아닌 byte 단위 numbering
+- segment 의 첫 byte number 를 sequence number 로 사용

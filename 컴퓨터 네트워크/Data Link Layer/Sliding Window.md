@@ -28,3 +28,7 @@ aliases:
 	- 기다리던 frame 아니면 discard
 - [[Selective Repeat]] -> Send window size = Receive window size
 - cf) [[Stop-and-Wait]] 는 Send 1 칸, Receive 1 칸
+
+### cf) [[TCP Sliding Window]]
+- layer 2 : 조건 따라 window size 고정
+- [[TCP]] : rwnd & cwnd 따라 size 가변, frame 아닌 byte 단위 관리

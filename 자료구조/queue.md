@@ -4,6 +4,7 @@ aliases:
   - 큐
   - 큐(Queue)
 ---
+
 - FIFO : First In First Out
 
 ### Code
@@ -47,3 +48,4 @@ $\forall$ queue $\in$ `queue`, item $\in$ `element`, maxQueueSize $\in$ `positiv
 
 ### 파생
 - [[원형 큐]]
+- [[FIFO Queue]] : [[Router]] 의 [[Scheduling]] 적용 형태

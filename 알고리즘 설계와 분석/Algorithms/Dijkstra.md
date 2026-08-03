@@ -9,11 +9,12 @@ formulation:
 domain:
   - graph
 ---
+
 - 음수 weight edge 허용 X
 - [[BFS]] 의 weighted version
 	- [[queue]] 대신 [[Priority Queue]] 사용 -> 항상 가장 작은 값 뽑음
 - [[Prim's Algorithm]]과 유사하게 동작
-	- S = 선택된 node 집합
+	- S = 선택된 [[node]] 집합
 	- V-S = priority queue Q 안의 집합
 
 ### Pseudocode
@@ -44,3 +45,7 @@ DIJKSTRA(graph[][] G, weight w, start s)
 2. 남은 가능성은 Q 에 남은 node 를 거치는 경로
 3. 그런데 u 가 Q 에서 가장 작은 estimate 를 거침
 4. 따라서 `u.d` 가 가장 작은 값이므로 확정
+
+### 활용
+- [[Link-State Routing]] : flooding 으로 모은 graph 에서 최단 경로 계산
+	- 구현 protocol -> [[OSPF]]

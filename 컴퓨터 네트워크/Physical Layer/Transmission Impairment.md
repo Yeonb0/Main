@@ -15,3 +15,8 @@ aliases:
 ### 특징
 - 신호 대 잡음 크기 지표 -> [[SNR]]
 - noise 하에서의 최대 전송량 한계 -> [[Shannon Capacity]]
+
+### 무선 환경
+- [[Pathloss]] : 거리에 따른 전력 손실 modeling
+- [[Fading]] : 장애물 · 반사에 의한 수신 세기 변동
+- 수신 하한 -> [[Receiver Sensitivity]]

@@ -6,7 +6,7 @@ aliases:
 ---
 
 - 유선 인터넷 표준 -> [[IEEE 802.3]]
-	- cf) IEEE 802.11 -> [[Wi-Fi]] 표준
+	- cf) IEEE 802.11 -> [[IEEE 802.11|Wi-Fi]] 표준
 - 네트워크 커버 영역
 	- [[LAN]] (local, 강의실 정도)
 	- [[MAN]] (metropolitan, 마포구 정도)

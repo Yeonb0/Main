@@ -24,4 +24,4 @@ aliases:
 1. Transmission Time (packet size, 갯수)
 2. Propagation Time (거리, 빛의 속도)
 - 둘 중 큰 쪽으로 time slot 설정
-- ==ex)== [[Wi-Fi]] : $9\mu s$ / [[Ethernet]] : 512 bit times
+- ==ex)== [[IEEE 802.11|Wi-Fi]] : $9\mu s$ / [[Ethernet]] : 512 bit times

@@ -10,7 +10,7 @@ aliases:
 ### 네트워크 구성
 - point-to-point : 직접적으로 유선 연결
 	- ==ex)== bus, [[switch]], hub
-- shared medium : [[Wi-Fi]] 같이 무선 매체로 공유
+- shared medium : [[IEEE 802.11|Wi-Fi]] 같이 무선 매체로 공유
 	- 한 번에 한 user 만 전송 O -> control 필요
 
 ### 종류

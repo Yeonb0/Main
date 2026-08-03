@@ -15,5 +15,5 @@ aliases:
 - bandwidth 와 transfer rate 거의 비례
 - [[신호]] 전송 위해 [[Modulation]] 필요
 - digital data 전송 -> [[Digital-to-Analog Conversion]] 경유
-- ==ex)== Wi-Fi, LTE / 5G
+- ==ex)== [[IEEE 802.11|Wi-Fi]], LTE / 5G
 	- 유선은 [[Baseband Transmission]]

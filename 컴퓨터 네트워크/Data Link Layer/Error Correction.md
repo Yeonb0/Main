@@ -16,3 +16,6 @@ aliases:
 ### 종류
 - [[Hamming Code]] : 1-bit correction
 - [[2-Dimensional Parity]] : 1-bit correction
+
+### 적용
+- 무선 전송의 Error Correcting Code (ECC) -> [[MCS]] 의 coding rate 로 비중 조절

@@ -8,6 +8,7 @@ formulation:
 domain:
   - graph
 ---
+
 - 음수 weight edge 허용
 
 ### Pseudocode
@@ -27,3 +28,7 @@ BELLMAN_FORD(graph[][] G, weight w, start s)
 
 ### 성능
 - $O(V^2 + VE)$
+
+### 활용
+- [[Distance Vector Routing]] : 각 [[Router]] 가 이웃과 table 교환하며 분산 실행
+	- 중앙 graph 없이 (destination, distance, next [[node]]) 만으로 relax

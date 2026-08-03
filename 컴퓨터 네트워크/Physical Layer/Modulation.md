@@ -22,3 +22,4 @@ aliases:
 - digital data -> [[Digital-to-Analog Conversion]]
 - analog data -> [[Analog-to-Analog Conversion]]
 - 변조 기준 신호 -> [[Carrier Signal]]
+- 다중 반송파 분할 전송 -> [[OFDM]]
