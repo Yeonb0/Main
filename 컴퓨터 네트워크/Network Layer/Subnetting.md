@@ -4,6 +4,7 @@ aliases:
   - 서브네팅(Subnetting)
   - Subnet Mask
   - 서브넷 마스크
+  - 서브넷
 ---
 
 - [[IPv4 Class]] 사이 이용 가능한 host 갯수 차이 큼 -> subnet 으로 network / host 구분 표시
@@ -28,6 +29,7 @@ aliases:
 	- subnet -> `11111111 11111111 11111111 11110000` (`255.255.255.224`)
 
 ### 표기
+- [[Subnetting|서브넷 마스크]] = CIDR
 ![[Internet-Addressing-04.png]]
 - 전체 주소 : ==IP 주소 / 1 갯수==
 - ==ex)== `205.16.37.39/28` 의 first address

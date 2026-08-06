@@ -12,7 +12,7 @@ aliases:
 
 ### 계층 구분
 - layer 1 & 2 : 직접 연결된 상대와 통신 (유선 / 무선)
-	- ==ex)== 802.11 (Wi-Fi) / [[Ethernet]] (유선) / PPP
+	- ==ex)== [[IEEE 802.11|802.11]] (Wi-Fi) / [[Ethernet]] (유선) / PPP
 	- 통신 위해선 양쪽 모두에 동일 protocol 필요
 - layer 3 : 여러 개 거쳐야 하는 목적지까지 데이터 전송
 	- IP 담당
@@ -28,4 +28,9 @@ aliases:
 ### 특징
 - 전세계 만국 공통 layer 3 프로토콜 -> [[Hourglass Model]] 의 허리
 - 상위 layer 4 에 [[IP Service Model]] 제공
-- 주소 체계 -> [[IP 주소]] (논리적 주소, IPv4 32 bit)
+- 주소 체계 -> [[IP 주소]] (논리적 주소, [[IPv4]] 32 bit)
+
+### 중계
+- [[Packet|패킷]] 단위로 데이터 송수신
+- [[Router|라우터]] · [[L3 스위치]] 같은 중계기에 의해 전송
+- [[TCP IP|TCP/IP]] [[컴퓨터 네트워크|네트워크]] 계층에 위치

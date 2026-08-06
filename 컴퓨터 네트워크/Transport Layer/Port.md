@@ -26,5 +26,6 @@ aliases:
 | dynamic ports | 49152 ~ 65535 | 관리 주체 X, 자유 사용 |
 
 - ==ex)== 22 ([[SSH]]), 25 (SMTP), 53 (DNS), 80 (HTTP), 443 (HTTPS)
+- ==ex)== [[FTP]] -> 제어용 21, 전송용 20
 - dynamic port -> [[운영체제|OS]] 자동 생성 시 사용 ([[NAT]])
 - [[IP 주소]]와 결합 -> [[Socket]]

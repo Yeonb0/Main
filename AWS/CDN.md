@@ -1,0 +1,4 @@
+---
+aliases:
+  - Content Delivery Network
+---

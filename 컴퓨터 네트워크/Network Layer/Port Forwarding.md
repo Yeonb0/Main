@@ -4,6 +4,7 @@ aliases:
   - Port Forwarding(포트 포워딩)
 ---
 
+- NAPT 방식 중 하나
 - [[NAT]] router 에 static mapping 수동 추가하는 설정
 - 내부 [[서버]]를 외부에 공개할 때 사용
 

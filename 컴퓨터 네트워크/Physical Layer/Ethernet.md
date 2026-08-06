@@ -38,3 +38,8 @@ aliases:
 - [[CSMA-CD|CSMA/CD]] 로 매체 접근 제어
 - 최소 frame 크기 512 bit (64 byte) -> collision detect 보장
 - time slot 512 bit times -> [[Binary Exponential Backoff]] 단위
+
+### 프레임 전송
+- [[LAN]] 에서 이용되는 [[데이터]] 링크 · 물리 계층 [[프로토콜]] -> [[TCP IP|TCP/IP]] 데이터 링크 계층 담당
+- 수신한 [[Packet|패킷]] 에 MAC 헤더 부착 -> 데이터 보낼 상대방 지정
+- 이더넷 프레임 내 데이터 -> 물리적 연결 통해 전기 [[신호]] 로 송출
