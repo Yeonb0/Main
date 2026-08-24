@@ -7,7 +7,7 @@ aliases:
 
 - Penn Treebank (펜 트리뱅크) [[말뭉치]]
 - 한 문장짜리 예제를 넘어선 본격적 규모의 텍스트 [[데이터]]
-- [[통계 기반 기법]] · [[word2vec]] 평가에 사용
+- [[통계 기반 기법]] · [[_inbox/_done/word2vec]] 평가에 사용
 
 ### 형태
 - 텍스트 파일, 원래 PTB 문장에 몇 가지 전처리 적용
@@ -82,3 +82,16 @@ for query in querys:
 > ![[자연어와-단어의-분산-표현-15.png]]
 
 - 의미 · 문법적 관점에서 유사한 단어가 상위 랭킹
+
+### RNNLM 학습 데이터 구성
+```python
+corpus, word_to_id, id_to_word = ptb.load_data('train')
+corpus_size = 1000
+corpus = corpus[:corpus_size]
+vocab_size = int(max(corpus) + 1)
+
+xs = corpus[:-1]  # 입력
+ts = corpus[1:]   # 출력 (정답 레이블)
+```
+- 입력 `corpus[:-1]` / [[정답 레이블]] `corpus[1:]` -> 한 칸 시프트
+- 작은 [[RNNLM]] 학습 시 앞 ==1000개== 단어만 절단 사용

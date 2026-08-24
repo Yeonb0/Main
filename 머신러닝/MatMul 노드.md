@@ -15,3 +15,10 @@ aliases:
 	- $\frac{\partial L}{\partial W} = x^{\mathrm{T}} \frac{\partial L}{\partial y}$
 - 형상 검사로 확인 O -> $\frac{\partial L}{\partial W}$ 형상 = $W$ 형상
 - 계산 결과 [[기울기]] 는 `grads` 에 보관 -> [[계층 구현 규칙]]
+
+### 원핫 벡터 입력
+- 입력이 원핫 벡터 -> 결과 = $W$ 에서 한 줄 뽑는 것과 동일
+
+![[word2vec-09.png]]
+- 한 줄 추출에 [[행렬의 곱]] 사용 -> 비효율 -> 개선 여지
+- ==ex)== [[CBOW 모델]] 입력층
