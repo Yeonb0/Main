@@ -196,3 +196,9 @@ img_show(img)  # 이미지 표시
 
 - flatten = `true` -> 1차원 넘파이 배열로 저장 -> `reshape(28, 28)` 로 28 × 28 복원
 - 넘파이 이미지 -> PIL 용 데이터 [[객체]] 변환 필요 -> `Image.fromarray()`
+
+### 인식 정확도
+![[딥러닝-02.png]]
+- 기법별 순위 정리 : https://rodrigob.github.io/are_we_there_yet/build/classification_datasets_results.html
+- 상위권 대부분 [[합성곱 신경망|CNN]] 기반
+- [[깊은 CNN]] -> ==99.38%==

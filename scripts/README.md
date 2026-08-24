@@ -39,7 +39,7 @@ _inbox/Export-xxx.zip  ←  여기에 던진다
         │       신규는 <제목>.md, 수정판은 <제목>.updated.md + .diff
         │
         ├─ ③ 링크 보강 (obsidian_autolink.py)
-        │     · LLM이 놓친 기존 개념에 [[ ]] 를 마저 건다
+        │     · LLM이 놓친 기존 개념에 [[ ]] 를 마저 건다$$
         │
         └─ ④ 원본을 _inbox/_done/ 으로 이동
                 │
