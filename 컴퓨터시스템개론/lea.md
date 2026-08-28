@@ -15,6 +15,10 @@ aliases:
 ### 용도
 - [[포인터]] 계산용 instruction
 - [[산술 명령어]] 보다 빠름 -> 정수 산술 [[연산]]에도 사용
+- [[배열]] 요소 · 행 주소 계산 -> [[배열의 어셈블리 구현]]
+	- ==ex)== `lea (%rsi, %rsi, 4), %rax` -> `5 × row_idx`
+	- ==ex)== `lea (%rdi, %rax, 4), %rax` -> `arr + 20 × row_idx`
+- base 와 index 에 같은 register -> scale 결합으로 [[상수]] 곱셈 대체
 
 ![[Assembly-Introduction-14.png]]
 

@@ -89,3 +89,19 @@ tags:
 - [[보안 그룹]]
 - [[Amazon WAF]]
 - [[GuardDuty|Amazon GuardDuty]]
+
+### 데브옵스/컨테이너/서버리스
+- [[데브옵스]]
+- [[서버 컨테이너|컨테이너]]
+- [[서버리스]]
+##### 오케스트레이션 서비스
+- [[ECS|Amazon ECS]]
+- [[EKS|Amazon EKS]]
+##### 컨테이너 실행 장소
+- [[EC2|Amazon EC2]]
+- [[Fargate]]
+
+- [[Lambda|AWS Lambda]]
+
+- [[API Gateway]]
+- 

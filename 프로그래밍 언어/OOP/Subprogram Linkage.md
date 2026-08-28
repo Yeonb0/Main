@@ -26,5 +26,10 @@ aliases:
 - ==ex)== FORTRAN
 	- 재귀 X
 	- nonlocal 변수 -> `COMMON` 으로 공유
-	- local 변수 -> static, 프로그램 실행 전 미리 메모리 고정
+	- local 변수 -> static, 프로그램 실행 전 미리 [[메모리]] 고정
 - [[stack]]-dynamic local 변수 사용 언어 -> [[Activation Record]] 필요
+
+### x86-64 구현
+- [[call]] : [[반환 주소]] [[stack]] 저장 -> subprogram 진입
+- [[ret]] : [[반환 주소]] pop -> [[Caller와 Callee|caller]] 복귀
+- 인수 · 결과 전달 -> [[x86-64 호출 규약]]
