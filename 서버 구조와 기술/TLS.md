@@ -4,6 +4,7 @@ aliases:
   - SSL/TLS
   - Transport Layer Security
   - TLS(Transport Layer Security)
+  - Secure Sockets Layer
 ---
 
 - 인터넷상에서 [[데이터]] 암호화해 송수신하는 [[프로토콜]] (SSL/TLS)
@@ -23,3 +24,9 @@ aliases:
 ### 한계
 - SSL 인증서 보유 웹 사이트와의 통신만 안전
 - 웹 이외 통신 대처 X -> [[VPN]]
+
+### SSL
+- Secure Sockets Layer
+- [[TCP]] / [[IP]] 계층 - 애플리케이션 계층 사이 위치
+- 인증 · 암호화 · 무결성 보장
+- [[인터페이스 보안]] 의 [[컴퓨터 네트워크|네트워크]] 영역 적용 방식 -> [[IPSec]] · [[S-HTTP]] 와 병렬
